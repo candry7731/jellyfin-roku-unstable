@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="TVEpisodes" extends="JFGroup">
+  <children>
+    <Poster id="seasonPoster" width="300" height="450" translation="[95,175]" />
+    <JFButton id="Random" text="Play Random" translation="[90, 640]" visible="false"></JFButton>
+    <TVEpisodeRowWithOptions id="picker" visible="true" />
+  </children>
+  <interface>
+    <field id="episodeSelected" alias="picker.itemSelected" />
+    <field id="quickPlayNode" type="node" alwaysNotify="true" />
+    <field id="seasonData" type="assocarray" onChange="setSeasonLoading" />
+    <field id="objects" alias="picker.objects" />
+  </interface>
+  <script type="text/brightscript" uri="TVEpisodes.brs" />
+  <script type="text/brightscript" uri="pkg:/source/api/Image.brs" />
+  <script type="text/brightscript" uri="pkg:/source/api/baserequest.brs" />
+  <script type="text/brightscript" uri="pkg:/source/utils/config.brs" />
+</component>
