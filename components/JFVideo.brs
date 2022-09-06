@@ -23,12 +23,23 @@ sub init()
     m.hideskipIntroButtonAnimation = m.top.findNode("hideskipIntroButton")
     m.moveUpskipIntroButtonAnimation = m.top.findNode("moveUpskipIntroButton")
     m.moveDownskipIntroButtonAnimation = m.top.findNode("moveDownskipIntroButton")
+
+    'Play Next Episode button
+    m.nextEpisodeButton = m.top.findNode("nextEpisode")
+    m.nextEpisodeButton.text = tr("Next Episode")
+    m.shownextEpisodeButtonAnimation = m.top.findNode("shownextEpisodeButton")
+    m.hidenextEpisodeButtonAnimation = m.top.findNode("hidenextEpisodeButton")
+    m.moveUpnextEpisodeButtonAnimation = m.top.findNode("moveUpnextEpisodeButton")
+    m.moveDownnextEpisodeButtonAnimation = m.top.findNode("moveDownnextEpisodeButton")
+    'print "JFViideo runtime =" m.top.runTime
 end sub
 
 '
 ' Checks if we have valid skip intro param data
 function haveSkipIntroParams() as boolean
-
+    'check current position
+    print "Current Player POsition" int(m.top.position)
+    print "m.top.runTime= "m.top.runTime
     ' Intro data is invalid, skip
     if not isValid(m.top.skipIntroParams?.Valid)
         return false
@@ -123,6 +134,24 @@ sub hideSkipIntro()
 end sub
 
 '
+' Runs Next Episode button animation and sets focus to button
+sub shownextEpisode()
+    m.shownextEpisodeButtonAnimation.control = "start"
+    m.nextEpisodeButton.setFocus(true)
+    m.nextEpisodeButton.text = tr("Next Episode") + m.episodeButton
+end sub
+
+'
+' Runs hide Next Episode button animation and sets focus back to video
+sub hidenextEpisode()
+    m.top.trickPlayBar.unobserveField("visible")
+    m.hidenextEpisodeButtonAnimation.control = "start"
+    m.nextEpisodeButton.setFocus(false)
+    m.top.setFocus(true)
+end sub
+
+
+'
 ' When Video Player state changes
 sub onState(msg)
 
@@ -191,6 +220,7 @@ sub ReportPlayback(state = "update" as string)
     playstateTask = m.global.playstateTask
     playstateTask.setFields({ status: state, params: params })
     playstateTask.control = "RUN"
+    print "Current Posistion =" m.top.position
 end sub
 
 '
@@ -244,14 +274,20 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 m.top.seek = m.top.skipIntroParams.IntroEnd
                 hideSkipIntro()
                 return true
+            else if m.nextEpisodeButton.hasFocus()
+                m.top.state = "finished"
+                hidenextEpisode()
+                return true
             end if
         end if
     end if
 
     if not press then return false
 
-    if m.top.Subtitles.count() and key = "down"
-        m.top.selectSubtitlePressed = true
+    if key = "down"
+        shownextEpisode()
+        m.episodeButton.control = "start"
+        'm.top.selectSubtitlePressed = true
         return true
     end if
 
