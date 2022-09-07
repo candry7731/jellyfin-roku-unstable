@@ -27,19 +27,21 @@ sub init()
     'Play Next Episode button
     m.nextEpisodeButton = m.top.findNode("nextEpisode")
     m.nextEpisodeButton.text = tr("Next Episode")
+    m.nextEpisodeButton.setFocus(false)
     m.shownextEpisodeButtonAnimation = m.top.findNode("shownextEpisodeButton")
     m.hidenextEpisodeButtonAnimation = m.top.findNode("hidenextEpisodeButton")
     m.moveUpnextEpisodeButtonAnimation = m.top.findNode("moveUpnextEpisodeButton")
     m.moveDownnextEpisodeButtonAnimation = m.top.findNode("moveDownnextEpisodeButton")
-    'print "JFViideo runtime =" m.top.runTime
 end sub
 
 '
 ' Checks if we have valid skip intro param data
 function haveSkipIntroParams() as boolean
     'check current position
-    print "Current Player POsition" int(m.top.position)
-    print "m.top.runTime= "m.top.runTime
+    if int(m.top.position) >= (m.top.runTime - 30)
+        shownextEpisode()
+        updateCount()
+    end if
     ' Intro data is invalid, skip
     if not isValid(m.top.skipIntroParams?.Valid)
         return false
@@ -136,9 +138,16 @@ end sub
 '
 ' Runs Next Episode button animation and sets focus to button
 sub shownextEpisode()
-    m.shownextEpisodeButtonAnimation.control = "start"
-    m.nextEpisodeButton.setFocus(true)
-    m.nextEpisodeButton.text = tr("Next Episode") + m.episodeButton
+    if m.nextEpisodeButton.hasFocus() = false
+        m.shownextEpisodeButtonAnimation.control = "start"
+        m.nextEpisodeButton.setFocus(true)
+    end if
+end sub
+
+'
+'Update count down text
+sub updateCount()
+    m.nextEpisodeButton.text = tr("Next Episode") + " " + Int(m.top.runTime - m.top.position).toStr()
 end sub
 
 '
@@ -220,7 +229,6 @@ sub ReportPlayback(state = "update" as string)
     playstateTask = m.global.playstateTask
     playstateTask.setFields({ status: state, params: params })
     playstateTask.control = "RUN"
-    print "Current Posistion =" m.top.position
 end sub
 
 '
@@ -285,9 +293,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
     if not press then return false
 
     if key = "down"
-        shownextEpisode()
-        m.episodeButton.control = "start"
-        'm.top.selectSubtitlePressed = true
+        m.top.selectSubtitlePressed = true
         return true
     end if
 
