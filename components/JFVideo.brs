@@ -37,11 +37,6 @@ end sub
 '
 ' Checks if we have valid skip intro param data
 function haveSkipIntroParams() as boolean
-    'check current position
-    if int(m.top.position) >= (m.top.runTime - 30)
-        shownextEpisode()
-        updateCount()
-    end if
     ' Intro data is invalid, skip
     if not isValid(m.top.skipIntroParams?.Valid)
         return false
@@ -110,6 +105,14 @@ sub onPositionChanged()
     if m.top.content.contenttype = 4
         handleSkipIntro()
     end if
+    'if video is ending in 30 seconds, show next episode button
+    if int(m.top.position) >= (m.top.runTime - 30)
+        shownextEpisode()
+        updateCount()
+    else
+        'hide next episode button
+        hidenextEpisode()
+    end if
 end sub
 
 '
@@ -140,6 +143,7 @@ end sub
 sub shownextEpisode()
     if m.nextEpisodeButton.hasFocus() = false
         m.shownextEpisodeButtonAnimation.control = "start"
+        m.nextEpisodeButton.visible = true
         m.nextEpisodeButton.setFocus(true)
     end if
 end sub
@@ -154,8 +158,8 @@ end sub
 ' Runs hide Next Episode button animation and sets focus back to video
 sub hidenextEpisode()
     m.top.trickPlayBar.unobserveField("visible")
-    m.hidenextEpisodeButtonAnimation.control = "start"
-    m.nextEpisodeButton.setFocus(false)
+    'm.hidenextEpisodeButtonAnimation.control = "start"
+    m.nextEpisodeButton.visible = false
     m.top.setFocus(true)
 end sub
 
@@ -292,7 +296,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
 
     if not press then return false
 
-    if key = "down"
+    if m.top.Subtitles.count() and key = "down"
         m.top.selectSubtitlePressed = true
         return true
     end if
